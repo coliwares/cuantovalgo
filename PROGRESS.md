@@ -82,7 +82,7 @@ Deploy:   ░░░░░░░░░░░░░░░░░░░░   0% ⏳
 - [x] Configurar dominio cuantovalgo.colivares.cl ✅
 
 ### 🔧 Features P1 Faltantes
-- [ ] Formulario crowdsourcing en página resultado
+- [x] Formulario crowdsourcing en página resultado ✅
 - [ ] Rate limiting real en `/api/insight` (3/min por IP)
 - [ ] Vercel Analytics integrado
 - [ ] Meta tags OG dinámicos con imagen personalizada

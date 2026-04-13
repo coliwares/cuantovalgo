@@ -25,7 +25,7 @@
 - [x] Cache de insights por (role + seniority + location + bucket)
 - [x] Página landing con CTA principal (diseño dark/neón completo)
 - [x] Mensaje de "datos limitados" cuando sample_size < 5
-- [ ] Formulario de contribución de sueldo anónimo
+- [x] Formulario de contribución de sueldo anónimo ✅
 - [ ] Rate limiting en API de insight (3/min por IP) (código preparado, implementación pendiente)
 - [x] Disclaimer de estimación visible en resultado
 - [x] Mobile responsive (prioridad alta: tráfico viral es móvil)
