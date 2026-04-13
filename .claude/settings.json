@@ -7,7 +7,9 @@
       "Bash(npx kill-port:*)",
       "Bash(grep -v \"^$\")",
       "Bash(timeout 8 bash -c 'npm run dev > /dev/null 2>&1 & sleep 4 && curl -s \"http://localhost:3000/api/salary-range?role=frontend&seniority=senior&location=chile_local\" | head -10')",
-      "Bash(curl -s \"http://localhost:3000/api/salary-range?role=qa&seniority=senior&location=chile_local\")"
+      "Bash(curl -s \"http://localhost:3000/api/salary-range?role=qa&seniority=senior&location=chile_local\")",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
