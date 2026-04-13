@@ -76,10 +76,10 @@ Deploy:   ░░░░░░░░░░░░░░░░░░░░   0% ⏳
 - [x] Ejecutar SQL para crear tablas ✅
 - [x] Cargar seed data a Supabase ✅ 29 registros
 - [x] Configurar ANTHROPIC_API_KEY ✅
-- [ ] Deploy a Vercel
-- [ ] Configurar env vars en Vercel
-- [ ] Probar en producción
-- [ ] Configurar dominio cuantovalgo.cl
+- [x] Deploy a Vercel ✅
+- [x] Configurar env vars en Vercel ✅
+- [x] Probar en producción ✅
+- [x] Configurar dominio cuantovalgo.colivares.cl ✅
 
 ### 🔧 Features P1 Faltantes
 - [ ] Formulario crowdsourcing en página resultado

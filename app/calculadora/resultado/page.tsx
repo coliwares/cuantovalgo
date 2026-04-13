@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import PercentileBar from '@/components/PercentileBar';
 import InsightCard from '@/components/InsightCard';
+import CrowdsourcingForm from '@/components/CrowdsourcingForm';
 import { calculatePercentile, getRecommendation, formatSalary } from '@/lib/salary-calculator';
 
 async function getSalaryData(params: {
@@ -133,6 +134,14 @@ async function ResultContent({
         p25={p25}
         p50={p50}
         p75={p75}
+        currency={currency}
+      />
+
+      {/* Formulario Crowdsourcing */}
+      <CrowdsourcingForm
+        role={role}
+        seniority={seniority}
+        location={location}
         currency={currency}
       />
 

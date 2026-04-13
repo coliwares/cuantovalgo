@@ -137,8 +137,9 @@
 - ✅ Configurar proyecto Supabase
 - ✅ Ejecutar seed data en Supabase (29 registros)
 - ✅ Configurar ANTHROPIC_API_KEY
-- ⏳ Deploy a Vercel
-- ⏳ Variables de entorno en producción
+- ✅ Deploy a Vercel
+- ✅ Variables de entorno en producción
+- ✅ Dominio configurado (cuantovalgo.colivares.cl)
 
 **Features faltantes P1:**
 - ⏳ Formulario de contribución crowdsourcing
@@ -169,7 +170,7 @@
    - Analytics
    - Meta tags OG mejorados
 
-**Estado:** 🟢 MVP 90% completo - **Backend 100% listo** ✅
+**Estado:** 🟢 MVP 100% COMPLETADO - **EN PRODUCCIÓN** 🚀
 
 ### 🎉 Completado recientemente (2026-04-12)
 
