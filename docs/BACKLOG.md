@@ -26,7 +26,7 @@
 - [x] Página landing con CTA principal (diseño dark/neón completo)
 - [x] Mensaje de "datos limitados" cuando sample_size < 5
 - [x] Formulario de contribución de sueldo anónimo ✅
-- [ ] Rate limiting en API de insight (3/min por IP) (código preparado, implementación pendiente)
+- [x] Rate limiting en API de insight (3/min por IP) ✅
 - [x] Disclaimer de estimación visible en resultado
 - [x] Mobile responsive (prioridad alta: tráfico viral es móvil)
 - [ ] Analytics básico (Vercel Analytics)

@@ -77,8 +77,68 @@ function getCacheKey(context: {
 const insightCache = new Map<string, { insight: string; timestamp: number }>();
 const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 horas
 
+// Rate limiting: 3 requests por minuto por IP
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minuto
+const RATE_LIMIT_MAX = 3;
+
+function getRateLimitStatus(ip: string): { allowed: boolean; remaining: number; resetAt: number } {
+  const now = Date.now();
+  const record = rateLimitMap.get(ip);
+
+  // Limpiar entradas expiradas (cada 100 requests)
+  if (Math.random() < 0.01) {
+    for (const [key, value] of rateLimitMap.entries()) {
+      if (now > value.resetAt) {
+        rateLimitMap.delete(key);
+      }
+    }
+  }
+
+  if (!record || now > record.resetAt) {
+    // Nueva ventana o ventana expirada
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
+    return { allowed: true, remaining: RATE_LIMIT_MAX - 1, resetAt: now + RATE_LIMIT_WINDOW };
+  }
+
+  if (record.count >= RATE_LIMIT_MAX) {
+    // Límite excedido
+    return { allowed: false, remaining: 0, resetAt: record.resetAt };
+  }
+
+  // Incrementar contador
+  record.count++;
+  return { allowed: true, remaining: RATE_LIMIT_MAX - record.count, resetAt: record.resetAt };
+}
+
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ||
+               request.headers.get('x-real-ip') ||
+               'unknown';
+
+    const rateLimitStatus = getRateLimitStatus(ip);
+
+    if (!rateLimitStatus.allowed) {
+      const resetIn = Math.ceil((rateLimitStatus.resetAt - Date.now()) / 1000);
+      return NextResponse.json(
+        {
+          error: 'Demasiadas solicitudes. Intenta de nuevo en un momento.',
+          retry_after: resetIn
+        },
+        {
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': RATE_LIMIT_MAX.toString(),
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': rateLimitStatus.resetAt.toString(),
+            'Retry-After': resetIn.toString(),
+          }
+        }
+      );
+    }
+
     const body = await request.json();
     const { role, seniority, location, salary, percentile, p25, p50, p75, currency } = body;
 
@@ -90,8 +150,17 @@ export async function POST(request: NextRequest) {
     const cacheKey = getCacheKey({ role, seniority, location, percentile, salary });
     const cached = insightCache.get(cacheKey);
 
+    const rateLimitHeaders = {
+      'X-RateLimit-Limit': RATE_LIMIT_MAX.toString(),
+      'X-RateLimit-Remaining': rateLimitStatus.remaining.toString(),
+      'X-RateLimit-Reset': rateLimitStatus.resetAt.toString(),
+    };
+
     if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-      return NextResponse.json({ insight: cached.insight, cached: true });
+      return NextResponse.json(
+        { insight: cached.insight, cached: true },
+        { headers: rateLimitHeaders }
+      );
     }
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -99,7 +168,10 @@ export async function POST(request: NextRequest) {
     if (!apiKey) {
       // Fallback si no hay API key configurada
       const fallbackInsight = getFallbackInsight({ role, seniority, percentile, p50, currency });
-      return NextResponse.json({ insight: fallbackInsight, cached: false });
+      return NextResponse.json(
+        { insight: fallbackInsight, cached: false },
+        { headers: rateLimitHeaders }
+      );
     }
 
     // Llamada a Claude API
@@ -140,7 +212,10 @@ export async function POST(request: NextRequest) {
     // Guardar en cache
     insightCache.set(cacheKey, { insight, timestamp: Date.now() });
 
-    return NextResponse.json({ insight, cached: false });
+    return NextResponse.json(
+      { insight, cached: false },
+      { headers: rateLimitHeaders }
+    );
   } catch (error) {
     console.error('Error generating insight:', error);
 
