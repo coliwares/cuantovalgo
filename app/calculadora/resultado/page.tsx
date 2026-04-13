@@ -4,26 +4,7 @@ import PercentileBar from '@/components/PercentileBar';
 import InsightCard from '@/components/InsightCard';
 import CrowdsourcingForm from '@/components/CrowdsourcingForm';
 import { calculatePercentile, getRecommendation, formatSalary } from '@/lib/salary-calculator';
-
-async function getSalaryData(params: {
-  role: string;
-  seniority: string;
-  location: string;
-  salary?: string;
-}) {
-  const { role, seniority, location, salary } = params;
-
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/salary-range?role=${role}&seniority=${seniority}&location=${location}`,
-    { next: { revalidate: 86400 } }
-  );
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch salary data');
-  }
-
-  return response.json();
-}
+import { getSalaryRange } from '@/lib/salary-data';
 
 async function ResultContent({
   searchParams,
@@ -47,7 +28,7 @@ async function ResultContent({
     );
   }
 
-  const data = await getSalaryData({ role, seniority, location, salary: salary?.toString() });
+  const data = await getSalaryRange(role, seniority, location);
 
   if (!data.has_data) {
     return (

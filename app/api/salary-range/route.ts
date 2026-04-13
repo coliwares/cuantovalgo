@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase';
-import type { SalaryBenchmark } from '@/types';
+import { getSalaryRange } from '@/lib/salary-data';
 
 // Marcar como ruta dinámica
 export const dynamic = 'force-dynamic';
@@ -22,44 +21,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Buscar en Supabase
-    const supabase = createServerClient();
+    const data = await getSalaryRange(role, seniority, location);
 
-    const { data: benchmark, error } = await supabase
-      .from('salary_benchmarks')
-      .select('*')
-      .eq('role', role)
-      .eq('seniority', seniority)
-      .eq('location', location)
-      .single();
-
-    if (error || !benchmark) {
-      return NextResponse.json(
-        {
-          p25: 0,
-          p50: 0,
-          p75: 0,
-          sample_size: 0,
-          currency: 'CLP',
-          has_data: false,
-        },
-        { status: 200 }
-      );
-    }
-
-    return NextResponse.json(
-      {
-        p25: benchmark.p25,
-        p50: benchmark.p50,
-        p75: benchmark.p75,
-        sample_size: benchmark.sample_size,
-        currency: benchmark.currency,
-        has_data: true,
-      },
-      { status: 200 }
-    );
+    return NextResponse.json(data, { status: 200 });
   } catch (error) {
-    console.error('Error fetching salary range:', error);
+    console.error('Error in salary-range API:', error);
     return NextResponse.json(
       { error: 'Error interno del servidor' },
       { status: 500 }
